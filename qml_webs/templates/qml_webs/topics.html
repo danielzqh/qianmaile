@@ -1,0 +1,23 @@
+{% extends 'qml_webs/base.html' %}
+
+{% block page_header %}
+  <p style="text-align:center; font-size:36px; color:red">所有主题</p>
+{% endblock page_header %}
+
+
+{% block content %}
+
+  <ul class="list-group border-bottom pb-2 mb-4">
+    {% for topic in topics %}
+      <li class="list-group-item border-0">
+        <a href="{% url 'qml_webs:topic' topic.id %}">
+          {{ topic.text }}</a>
+      </li>
+    {% empty %}
+      <li class="list-group-item border-0">无主题.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'qml_webs:new_topic' %}">添加新主题</a>
+
+{% endblock content %}

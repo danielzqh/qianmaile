@@ -1,0 +1,44 @@
+{% extends 'qml_webs/base.html' %}
+{% block page_header %}
+  <p style="text-align:center; font-size:36px; color:red">人物介绍</p>
+{% endblock page_header %}
+
+
+{% block content %}
+
+  <style>
+    .two-row{
+      display: flex;
+      gap: 20px;
+    }
+    .col-left{
+      width: 40%;
+      padding: 15px;
+    }
+    .col-right{
+      width: 60%;
+      padding: 15px;
+    }
+  </style>
+
+  <ul>
+    {% for person in persons %}
+      <div class="two-row">
+        <div class="col-left">
+          <img src="{{ person.image.url }}">
+        </div>
+        <div class="col-right">
+          <a href="{% url 'qml_webs:person_details' person.id %}"><span style="font-size:30px;">{{ person.name }}</span></a>
+          <br>
+          <br>
+          <h2>{{ person.title }}</h2>
+          <br>
+          <p>{{ person.description }}</p>
+        </div>
+      </div>
+    {% empty %}
+      <li>No persons joined yet.</li>
+    {% endfor %}
+  </ul>
+
+{% endblock content %}

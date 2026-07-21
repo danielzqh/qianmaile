@@ -1,0 +1,17 @@
+{% extends "qml_webs/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block page_header %}
+  <h2>主题: <a href="{% url 'qml_webs:topic' topic.id %}">{{ topic }}</a></h2>
+{% endblock page_header %}
+
+{% block content %}
+
+  <p>添加内容:</p>
+  <form action="{% url 'qml_webs:new_entry' topic.id %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button button_type="submit" content="添加内容" %}
+  </form>
+
+{% endblock content %}

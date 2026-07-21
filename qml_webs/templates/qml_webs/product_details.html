@@ -1,0 +1,24 @@
+{% extends 'qml_webs/base.html' %}
+{% block page_header %}
+  <h1>{{ product.name }}</h1>
+{% endblock page_header %}
+
+{% block content %}
+    <p>介绍: {{ product.description }}</p>
+    <p>日期: {{ product.date_added }}</p>
+    <video width="300" controls>
+        <source src="{{ product.video_file.url }}" type="video/mp4">
+    </video>
+
+    <p>详细内容:</p>
+    <ul>
+        {% for detail in details %}
+            <li>
+                <p>{{ detail.text|linebreaks }}</p>
+            </li>
+        {% empty %}
+            <li>There are no details for this product yet.</li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

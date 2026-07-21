@@ -1,0 +1,35 @@
+{% extends 'qml_webs/base.html' %}
+{% block page_header %}
+  <h1>{{ person.name }}</h1>
+{% endblock page_header %}
+
+{% block content %}
+
+    <p>职位: {{ person.title }}</p>
+    <p>简介: {{ person.description }}</p>
+    <p>日期: {{ person.date_joined }}</p>
+    <p><img src="{{ person.image.url }}"></p>
+
+    <p>学习工作情况:</p>
+    <ul>
+        {% for detail in details %}
+            <li>
+                <p>{{ detail.text|linebreaks }}</p>
+            </li>
+        {% empty %}
+            <li>无详细内容.</li>
+        {% endfor %}
+    </ul>
+
+    <p>荣誉技能情况:</p>
+    <ul>
+        {% for honorskill in honorskills %}
+            <li>
+                <p>{{ honorskill.text|linebreaks }}</p>
+            </li>
+        {% empty %}
+            <li>无详细内容.</li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% extends 'qml_webs/base.html' %}
+
+{% block page_header %}
+    <h1>主题: {{ topic.text }}</h1>
+{% endblock page_header %}
+
+{% block content %}
+    <p>
+        <a href="{% url 'qml_webs:new_entry' topic.id %}">添加内容</a>
+    </p>
+
+    {% for entry in entries %}
+        <div class="card mb-3">
+            <h4 class="card-header">
+                {{ entry.date_added|date:'M d, Y H:i' }}
+                <small><a href="{% url 'qml_webs:edit_entry' entry.id %}">
+                    修改内容</a></small>
+            </h4>
+            <div class="card-body">{{ entry.text|linebreaks }}</div>
+        </div>
+    {% empty %}
+        <p>无内容.</p>
+    {% endfor %}
+
+{% endblock content %}

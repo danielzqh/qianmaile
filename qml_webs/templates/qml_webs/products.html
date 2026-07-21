@@ -1,0 +1,42 @@
+{% extends 'qml_webs/base.html' %}
+{% block page_header %}
+  <p style="text-align:center; font-size:36px; color:red">产品介绍</p>
+{% endblock page_header %}
+
+{% block content %}
+  <style>
+    .two-row{
+      display: flex;
+      gap: 20px;
+    }
+    .col-left{
+      width: 40%;
+      padding: 15px;
+    }
+    .col-right{
+      width: 60%;
+      padding: 15px;
+    }
+  </style>
+
+  <ul>
+    {% for product in products %}
+      <div class="two-row">
+        <div class="col-left">
+          <video width="300" controls>
+            <source src="{{ product.video_file.url }}" type="video/mp4">
+          </video>
+        </div>
+        <div class="col-right">
+          <a href="{% url 'qml_webs:product_details' product.id %}"><span style="font-size:30px;">{{ product.name }}</span></a>
+          <br>
+          <br>
+          <p>{{ product.description }}</p>
+        </div>
+      </div>
+    {% empty %}
+      <li>No products added yet.</li>
+    {% endfor %}
+  </ul>
+
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "qml_webs/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block page_header %}
+  <h2>注册您的账号.</h2>
+{% endblock page_header %}
+
+{% block content %}
+
+  <form action="{% url 'accounts:register' %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button button_type="submit" content="注册" %}
+  </form>
+
+{% endblock content %}
