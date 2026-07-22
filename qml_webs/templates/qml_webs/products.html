@@ -10,11 +10,11 @@
       gap: 20px;
     }
     .col-left{
-      width: 40%;
+      width: 50%;
       padding: 15px;
     }
     .col-right{
-      width: 60%;
+      width: 50%;
       padding: 15px;
     }
   </style>
@@ -23,7 +23,7 @@
     {% for product in products %}
       <div class="two-row">
         <div class="col-left">
-          <video width="300" controls>
+          <video width="200" controls>
             <source src="{{ product.video_file.url }}" type="video/mp4">
           </video>
         </div>
