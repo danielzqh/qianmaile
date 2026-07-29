@@ -3,6 +3,8 @@ from .models import Person, PersonDetail, Product, ProductDetail, Topic, Entry
 from .forms import TopicForm, EntryForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+import subprocess
+import os
 
 # Create your views here.
 def index(request):
@@ -108,3 +110,4 @@ def edit_entry(request, entry_id):
 
     context = {'entry': entry, 'topic': topic, 'form': form}
     return render(request, 'qml_webs/edit_entry.html', context)
+

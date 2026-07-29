@@ -10,6 +10,17 @@
         <source src="{{ product.video_file.url }}" type="video/mp4">
     </video>
 
+    <style>
+        .btn2{
+            font-size: 30px;
+            color: #2563eb;
+            text-decoration: underline;
+            display: inline-block;
+        }
+    </style>
+
+    <p><a href="/static/game/alien_invasion.exe" download class="btn2">下载游戏</a></p>
+
     <p>详细内容:</p>
     <ul>
         {% for detail in details %}
@@ -20,5 +31,7 @@
             <li>There are no details for this product yet.</li>
         {% endfor %}
     </ul>
+
+
 
 {% endblock content %}
