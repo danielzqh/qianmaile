@@ -32,6 +32,7 @@
           <br>
           <br>
           <p>{{ product.description }}</p>
+          <a href="{% url 'qml_webs:create_order' product.id %}">价格：￥{{ product.price }}</a>
         </div>
       </div>
     {% empty %}

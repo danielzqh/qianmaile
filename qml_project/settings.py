@@ -26,12 +26,26 @@ SECRET_KEY = 'django-insecure-*s*4i%d)dhh1g3$1hq4o510xxz#e16xx#p9e&p8_4%=%b2ghl&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["124.221.16.220","localhost","127.0.0.1"]
+ALLOWED_HOSTS = ["localhost","127.0.0.1"]
 
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+WECHAT_PAY = {
+    "mch_id": "1749336517",
+    "app_id": "wx110cf8ee11ecf540",
+    "api_v3_key": "zqhlele_19901706937_1749336517_3",
+    "private_key": BASE_DIR / "qml_webs/api_cert/apiclient_key.pem",
+    "serial_no": "4E273844F1160B34CF1F5C06924E280FA7391F88",
+    "cert": BASE_DIR / "qml_webs/api_cert/apiclient_cert.pem",
+    "notify_url": "https://qianmaile.com.cn/wxpay/notify/",
+}
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_extensions',
     'qml_webs',
     'accounts',
     'django_bootstrap5',

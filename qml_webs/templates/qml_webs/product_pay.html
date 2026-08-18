@@ -1,0 +1,38 @@
+{% extends 'qml_webs/base.html' %}
+{% block page_header %}
+  <h1>{{ product.name }}</h1>
+{% endblock page_header %}
+
+{% block content %}
+    <p>介绍: {{ product.description }}</p>
+    <p>日期: {{ product.date_added }}</p>
+    <img id="qrImg">
+    <div id="orderNo"></div>
+    <script>
+        let orderNo = "";
+        fetch("/pay/order_view/?pid={{ product.id }}")
+        .then(r=>r.json())
+        .then(res=>{
+            if(res.ok){
+                orderNo = res.order_no;
+                document.getElementById("qrImg").src = res.qr_img;
+                document.getElementById("orderNo").innerText = "订单号: "+orderNo;
+                pollStatus();
+            }
+        })
+        function pollStatus(){
+            let timer = setInterval(()=>{
+                fetch('/pay/query_order/?order_no='+orderNo)
+                .then(r=>r.json()).then(res=>{
+                    console.log("poll status:", res);
+                    if(res.status == 1){
+                        clearInterval(timer);
+                        alert("支付成功！ {{ product.name }} " + orderNo);
+                        location.href="/pay/order_success/{{ product.id }}";
+                    }
+                })
+            },1500);
+        }
+    </script>
+
+{% endblock content %}

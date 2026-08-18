@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect
-from .models import Person, PersonDetail, Product, ProductDetail, Topic, Entry
+from .models import Person, Product, Topic, Entry, Order
 from .forms import TopicForm, EntryForm
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
-import subprocess
-import os
+from django.http import Http404, JsonResponse, HttpResponse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from .utils.wechat_pay import create_native_order, generate_qrcode_data, wx_query_order, wx_aes_gcm_decrypt
+import uuid, json
+
+
 
 # Create your views here.
 def index(request):
@@ -111,3 +115,91 @@ def edit_entry(request, entry_id):
     context = {'entry': entry, 'topic': topic, 'form': form}
     return render(request, 'qml_webs/edit_entry.html', context)
 
+def create_order(request, product_id):
+    product = Product.objects.get(id=product_id)
+    context = {'product': product}
+    return render(request, 'qml_webs/product_pay.html', context)
+
+def create_order_view(request):
+    """create order, return scan to pay qr code"""
+    product_id = request.GET.get("pid")
+    product = Product.objects.get(id=product_id)
+    order_no = str(uuid.uuid4()).replace("-", "")
+    order = Order.objects.create(
+        order_no=order_no,
+        product=product,
+        total_fee=product.price,
+    )
+    #use wechat native to order
+    res = create_native_order(order_no, float(product.price), product.name)
+    print("create_order_view:" + order_no + " " + res["code_url"])
+    if res.get("code_url"):
+        order.code_url = res["code_url"]
+        order.save()
+        qr_b64 = generate_qrcode_data(res["code_url"])
+        return JsonResponse({
+            "ok": True,
+            "order_no": order_no,
+            "qr_img": qr_b64
+        })
+    else:
+        return JsonResponse({"ok":False,"msg":res.get("message","Use wechat failure")})
+
+def query_order_status(request):
+    """query order status from frontend"""
+    order_no = request.GET.get("order_no")
+    order = Order.objects.filter(order_no=order_no).first()
+    print("query_order_status:" + order_no + " " + str(order.status))
+    if not order:
+        return JsonResponse({"ok":False,"msg":"Order does not exist"})
+
+    if order.status == Order.STATUS_PAID:
+        return JsonResponse({"status":Order.STATUS_PAID})
+
+    wx_result = wx_query_order(order_no)
+    if wx_result is None:
+        return JsonResponse({"status":Order.STATUS_PENDING})
+
+    trade_state = wx_result.get("trade_state")
+    print("query_order_status: " + trade_state)
+    if trade_state == "SUCCESS":
+        order.status = Order.STATUS_PAID
+        order.transaction_id = wx_result.get("transaction_id")
+        order.pay_time = wx_result.get("success_time")
+        order.save()
+        return JsonResponse({"status":Order.STATUS_PAID})
+    else:
+        return JsonResponse({"status":Order.STATUS_PENDING})
+
+
+@csrf_exempt
+def wechat_pay_notify(request):
+    """wechat pay notify response, public https"""
+    print("wechat_pay_notify method:" + request.method)
+    if request.method != 'POST':
+        return JsonResponse({"code": "FAIL", "message": "method error"}, status=405)
+
+    try:
+        body = request.body
+        data = json.loads(body)
+        resource = data["resource"]
+        nonce = resource["nonce"]
+        ciphertext = resource["ciphertext"]
+        associated_data = resource["associated_data"]
+        pay_info = wx_aes_gcm_decrypt(ciphertext, nonce, associated_data)
+
+        order_no = pay_info["out_trade_no"]
+        transaction_id = pay_info["transaction_id"]
+        trade_state = pay_info["trade_state"]
+        print("wechat_pay_notify:" + order_no + " " + transaction_id + " " + trade_state)
+        order = Order.objects.filter(order_no=order_no).first()
+        if order and trade_state == "SUCCESS":
+            order.status = Order.STATUS_PAID
+            order.transaction_id = transaction_id
+            order.pay_time = timezone.now()
+            order.save()
+
+        return JsonResponse({"code":"SUCCESS","message":"OK"})
+
+    except Exception as e:
+        return JsonResponse({"code":"FAIL","message": "error"}, status=500)

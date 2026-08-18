@@ -17,4 +17,9 @@ urlpatterns = [
     path('new_topic/', views.new_topic, name='new_topic'),
     path('new_entry/<int:topic_id>/', views.new_entry, name='new_entry'),
     path('edit_entry/<int:entry_id>/', views.edit_entry, name='edit_entry'),
+    path('pay/order/<int:product_id>/', views.create_order, name='create_order'),
+    path('pay/order_view/', views.create_order_view, name='create_order_view'),
+    path('pay/query_order/', views.query_order_status, name='query_order'),
+    path('pay/wechat_notify/', views.wechat_pay_notify, name='wechat_notify'),
+    path('pay/order_success/<int:product_id>', views.product_details, name='order_success'),
 ]
