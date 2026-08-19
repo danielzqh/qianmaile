@@ -52,7 +52,7 @@ def create_native_order(out_trade_no, total_fee, description):
         "description": description,
         "notify_url": wechat_config['notify_url'],
         "amount": {"total": amount, "currency": "CNY"},
-        "notify_url": "https://qianmaile.com.cn/pay/wechat_notify",
+        "notify_url": "https://qianmaile.com.cn/pay/wechat_notify/",
     }
     import json
     body_json = json.dumps(req_body)
@@ -107,9 +107,15 @@ def wx_query_order(out_trade_no):
 
 def wx_aes_gcm_decrypt(nonce, ciphertext, associated_data):
     """wechat v3 notify aes-gcm decrypt"""
-    key_bytes = get_private_key().encode("utf-8")
-    cipher = Cipher(algorithms.AES(key_bytes), modes.GCM(base64.b64decode(nonce)), backend=default_backend())
+    API_V3_KEY = wechat_config['api_v3_key']
+    key_bytes = API_V3_KEY.encode("utf-8")
+    nonce_bytes = nonce.encode("utf-8")
+    ad_bytes = associated_data.encode("utf-8")
+    cipher_all = base64.b64decode(ciphertext)
+    tag = cipher_all[-16:]
+    cipher_data = cipher_all[:-16]
+    cipher = Cipher(algorithms.AES(key_bytes), modes.GCM(nonce_bytes, tag), backend=default_backend())
     decryptor = cipher.decryptor()
-    decryptor.authenticate_additional_data(associated_data.encode("utf-8"))
-    raw = decryptor.update(base64.b64decode(ciphertext)) + decryptor.finalize()
+    decryptor.authenticate_additional_data(ad_bytes)
+    raw = decryptor.update(cipher_data) + decryptor.finalize()
     return json.loads(raw.decode("utf-8"))

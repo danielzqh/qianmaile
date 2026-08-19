@@ -181,17 +181,28 @@ def wechat_pay_notify(request):
 
     try:
         body = request.body
+        print(f"wechat raw body: {body.decode('utf-8')}")
+
+        #import xml.etree.ElementTree as ET
+        #root = ET.fromstring(body)
+        #resource_node = root.find("./resource")
+        #nonce = resource_node.find("nonce").text
+        #ciphertext = resource_node.find("ciphertext").text
+        #associated_data = resource_node.find("associated_data").text
+
         data = json.loads(body)
         resource = data["resource"]
         nonce = resource["nonce"]
         ciphertext = resource["ciphertext"]
         associated_data = resource["associated_data"]
         pay_info = wx_aes_gcm_decrypt(ciphertext, nonce, associated_data)
+        print(f"decrypt pay_info: {pay_info}")
 
         order_no = pay_info["out_trade_no"]
         transaction_id = pay_info["transaction_id"]
         trade_state = pay_info["trade_state"]
         print("wechat_pay_notify:" + order_no + " " + transaction_id + " " + trade_state)
+
         order = Order.objects.filter(order_no=order_no).first()
         if order and trade_state == "SUCCESS":
             order.status = Order.STATUS_PAID
@@ -202,4 +213,7 @@ def wechat_pay_notify(request):
         return JsonResponse({"code":"SUCCESS","message":"OK"})
 
     except Exception as e:
+        import traceback
+        stack = traceback.format_exc()
+        print(f"=====WECHAT_NOTIFY_ERROR=====\n{stack}")
         return JsonResponse({"code":"FAIL","message": "error"}, status=500)

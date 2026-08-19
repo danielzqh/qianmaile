@@ -1,9 +1,11 @@
 <!doctype html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>上海谦迈乐信息技术有限公司</title>
+    <title>谦迈乐</title>
+    <link rel="icon" href="{% static 'img/logo_32_32.png' %}" type="image/png" sizes="32x32">
     {% load django_bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
@@ -12,7 +14,7 @@
 <body>
     <nav class="navbar navbar-expand-md navbar-light bg-light mb-4 border">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'qml_webs:index' %}">上海谦迈乐信息技术有限公司</a>
+            <a class="navbar-brand" href="{% url 'qml_webs:index' %}"><img src="{% static 'img/logo_100_50.png' %}"></a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
@@ -58,6 +60,9 @@
         </div>
         <div>
             {% block content %}{% endblock content %}
+        </div>
+        <div>
+            {% block page_bottom %}{% endblock page_bottom %}
         </div>
     </main>
 
